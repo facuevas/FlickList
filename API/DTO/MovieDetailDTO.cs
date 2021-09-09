@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using Domain;
 
+// MovieDetail DTO
+// We use this to map our Movie model
+// This helps us prevent cycles
+
 namespace API.DTO
 {
     public class MovieDetailDTO

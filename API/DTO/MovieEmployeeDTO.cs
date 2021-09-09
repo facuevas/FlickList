@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+//MovieEmployee DTO
+// We use this to map the MovieEmployee join table.
+// This helps us prevent cycles
+
 namespace API.DTO
 {
     public class MovieEmployeeDTO

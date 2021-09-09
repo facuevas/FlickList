@@ -29,7 +29,6 @@ namespace Persistence
                 .HasOne(m => m.Movie)
                 .WithMany(p => p.Employees)
                 .HasForeignKey(m => m.MovieId);
-
         }
     }
 }

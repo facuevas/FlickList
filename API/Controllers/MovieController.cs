@@ -9,6 +9,8 @@ using AutoMapper;
 using Domain;
 using System.Collections.Generic;
 using API.Core;
+using FluentValidation.Results;
+using API.Validator;
 
 namespace API.Controllers
 {
@@ -87,6 +89,13 @@ namespace API.Controllers
                 Employees = employees
             };
 
+            // Validate the movie
+            ValidationResult validationResult = new MovieValidator().Validate(movie);
+            if (!validationResult.IsValid)
+            {
+                return ValidationProblem(validationResult.ToString());
+            }
+
             // Add movie, employee(s) into the Database (in-memory)
             _context.Movies.Add(movie);
             _context.People.AddRange(people);
@@ -97,6 +106,32 @@ namespace API.Controllers
             if (!result) return BadRequest("Error adding movie");
 
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMovie(Guid id)
+        {
+            var movie = await _context.Movies.FindAsync(id);
+
+            _context.Remove(movie);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) BadRequest("Failed to delete movie");
+
+            return Ok("Movie deleted successfully");
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditMovie(Guid id, Movie mv)
+        {
+            var movie = await _context.Movies.FindAsync(id);
+
+            if (movie == null) return NotFound("Movie to edit is not found");
+
+            _mapper.Map(movie, mv);
+
+            return Ok("Test");
         }
     }
 }
