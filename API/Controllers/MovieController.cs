@@ -26,7 +26,8 @@ namespace API.Controllers
         public async Task<IActionResult> GetMovies()
         {
             // Query DB to list all movies.
-            var movies = await _context.Movies.ProjectTo<MovieDetailDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            //var movies = await _context.Movies.ProjectTo<MovieDetailDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            var movies = await _context.Movies.ToListAsync();
 
             if (movies == null) return NotFound("No movies found");
 
@@ -123,15 +124,27 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditMovie(Guid id, Movie mv)
+        public async Task<IActionResult> EditMovie(Guid id, MovieDetailDTO mv)
         {
             var movie = await _context.Movies.FindAsync(id);
 
             if (movie == null) return NotFound("Movie to edit is not found");
 
-            _mapper.Map(movie, mv);
+            var updatedMovie = new Movie
+            {
+                Id = id,
+                Title = mv.Title,
+                ReleaseDate = mv.ReleaseDate,
+                Runtime = mv.RunTime
+            };
 
-            return Ok("Test");
+            _mapper.Map(updatedMovie, movie);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("Error updating Movie");
+
+            return Ok("Movie updated");
         }
     }
 }
