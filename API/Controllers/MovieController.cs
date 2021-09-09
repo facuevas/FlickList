@@ -138,6 +138,13 @@ namespace API.Controllers
                 Runtime = mv.RunTime
             };
 
+            // Validate the movie
+            ValidationResult validationResult = new MovieValidator().Validate(updatedMovie);
+            if (!validationResult.IsValid)
+            {
+                return ValidationProblem(validationResult.ToString());
+            }
+
             _mapper.Map(updatedMovie, movie);
 
             var result = await _context.SaveChangesAsync() > 0;
