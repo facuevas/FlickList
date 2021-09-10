@@ -154,55 +154,55 @@ namespace API.Controllers
             return Ok("Movie updated");
         }
 
-        [HttpPut("{id}/addEmployee")]
-        public async Task<IActionResult> AddActorToMovie(Guid id, [FromBody] ICollection<MovieEmployeeDTO> newMovieEmployees)
-        {
-            // Return if request was sent with no new employees
-            if (newMovieEmployees.Count == 0) return ValidationProblem("No new movie employees added");
+        // [HttpPatch("{id}/addEmployee")]
+        // public async Task<IActionResult> AddActorToMovie(Guid id, [FromBody] ICollection<MovieEmployeeDTO> newMovieEmployees)
+        // {
+        //     // Return if request was sent with no new employees
+        //     if (newMovieEmployees.Count == 0) return ValidationProblem("No new movie employees added");
 
-            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+        //     var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (movie == null) return NotFound("Cannot add actor to requested Movie: Movie not found");
+        //     if (movie == null) return NotFound("Cannot add actor to requested Movie: Movie not found");
 
-            // Sanitize newMovieEmployees
-            ICollection<MovieEmployeeDTO> sanitizedNewME = MovieHelpers.SanitizeEmployeesInput(newMovieEmployees);
+        //     // Sanitize newMovieEmployees
+        //     ICollection<MovieEmployeeDTO> sanitizedNewME = MovieHelpers.SanitizeEmployeesInput(newMovieEmployees);
 
-            // Temporary list to store new database entires
-            List<Person> people = new List<Person>();
+        //     // Temporary list to store new database entires
+        //     List<Person> people = new List<Person>();
 
-            foreach (var employee in sanitizedNewME)
-            {
-                // Check if the person already exists in the database.
-                // If not, continue and don't re-add to the database.
-                var personInDB = await _context.People.SingleOrDefaultAsync(p => (p.FirstName == employee.FirstName && p.LastName == employee.LastName));
-                if (personInDB == null)
-                {
-                    continue;
-                }
+        //     foreach (var employee in sanitizedNewME)
+        //     {
+        //         // Check if the person already exists in the database.
+        //         // If not, continue and don't re-add to the database.
+        //         var personInDB = await _context.People.SingleOrDefaultAsync(p => (p.FirstName == employee.FirstName && p.LastName == employee.LastName));
+        //         if (personInDB == null)
+        //         {
+        //             continue;
+        //         }
 
-                // Create the person and store in an List
-                // We will insert all at the same time as opposed to per person
-                var person = new Person
-                {
-                    FirstName = employee.FirstName,
-                    LastName = employee.LastName
-                };
+        //         // Create the person and store in an List
+        //         // We will insert all at the same time as opposed to per person
+        //         var person = new Person
+        //         {
+        //             FirstName = employee.FirstName,
+        //             LastName = employee.LastName
+        //         };
 
-                movie.Employees.Add(new MovieEmployee { Person = person });
-                people.Add(person);
-            }
+        //         movie.Employees.Add(new MovieEmployee { Person = person });
+        //         people.Add(person);
+        //     }
 
-            // Save new Person entires to the database
-            await _context.People.AddRangeAsync(people);
-            _context.Update(movie);
-            //_context.Movies.FirstOrDefaultAsync
+        //     // Save new Person entires to the database
+        //     await _context.People.AddRangeAsync(people);
+        //     _context.Update(movie);
+        //     //_context.Movies.FirstOrDefaultAsync
 
-            var result = await _context.SaveChangesAsync() > 0;
+        //     var result = await _context.SaveChangesAsync() > 0;
 
-            if (!result) return BadRequest("Error adding to database");
+        //     if (!result) return BadRequest("Error adding to database");
 
-            return Ok("Updated employees list in the movie");
+        //     return Ok("Updated employees list in the movie");
 
-        }
+        // }
     }
 }

@@ -8,7 +8,7 @@ namespace API.Core
     {
         public MappingProfiles()
         {
-            //
+            // For our edits
             CreateMap<Movie, Movie>();
             CreateMap<Person, Person>();
 
@@ -25,6 +25,15 @@ namespace API.Core
             CreateMap<MovieEmployee, MovieEmployeeDTO>()
                 .ForMember(me => me.FirstName, o => o.MapFrom(p => p.Person.FirstName))
                 .ForMember(me => me.LastName, o => o.MapFrom(p => p.Person.LastName));
+
+            // Employee Mappings
+            CreateMap<Person, PersonDTO>();
+
+            CreateMap<Person, PersonDetailDTO>();
+
+            CreateMap<MovieEmployee, MovieEmployedDTO>()
+                .ForMember(me => me.Title, o => o.MapFrom(m => m.Movie.Title))
+                .ForMember(me => me.ReleaseDate, o => o.MapFrom(m => m.Movie.ReleaseDate));
         }
     }
 }
