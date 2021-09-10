@@ -12,8 +12,12 @@ namespace API.Core
             CreateMap<Movie, Movie>();
             CreateMap<Person, Person>();
 
-            // Use AutoMapper to map Movie with our MovieDetailDTO
+            // Use AutoMapper to map Movie
+            // MovieDetailDTO for single, listed movies
+            // MovieDTO for overall movies.
+            CreateMap<Movie, MovieDTO>();
             CreateMap<Movie, MovieDetailDTO>();
+
 
             // Use AutoMapper to map MovieEmployee with our MovieEmployeeDTO
             // Map specifically the first name and the last name
