@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using API.DTO;
+using API.DTO.MovieDTOs;
 
 namespace API.Core
 {

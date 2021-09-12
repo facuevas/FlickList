@@ -1,10 +1,7 @@
-using System;
-
-namespace API.DTO
+namespace API.DTO.PersonDTOs
 {
-    public class PersonDTO
+    public class PersonUpdateDTO
     {
-        public Guid Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }

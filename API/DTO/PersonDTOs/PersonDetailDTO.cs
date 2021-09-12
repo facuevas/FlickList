@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace API.DTO
+namespace API.DTO.PersonDTOs
 {
     public class PersonDetailDTO
     {

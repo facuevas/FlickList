@@ -6,7 +6,7 @@ using Domain;
 // We use this to map our Movie model
 // This helps us prevent cycles
 
-namespace API.DTO
+namespace API.DTO.MovieDTOs
 {
     public class MovieDetailDTO
     {

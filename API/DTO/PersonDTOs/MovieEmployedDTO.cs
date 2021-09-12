@@ -1,6 +1,6 @@
 using System;
 
-namespace API.DTO
+namespace API.DTO.PersonDTOs
 {
     public class MovieEmployedDTO
     {

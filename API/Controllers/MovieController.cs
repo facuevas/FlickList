@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using API.DTO;
+using API.DTO.MovieDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -12,6 +12,7 @@ using API.Core;
 using FluentValidation.Results;
 using API.Validator;
 using System.Linq;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace API.Controllers
 {
@@ -78,7 +79,7 @@ namespace API.Controllers
                 };
 
                 employees.Add(new MovieEmployee { Person = person });
-                people.Add(person);
+                await new PersonController(_context, _mapper).AddNewPerson(person);
             }
 
             // Create the Movie
@@ -99,7 +100,6 @@ namespace API.Controllers
 
             // Add movie, employee(s) into the Database (in-memory)
             _context.Movies.Add(movie);
-            _context.People.AddRange(people);
 
             // Save changes
             var result = await _context.SaveChangesAsync() > 0;
@@ -154,55 +154,12 @@ namespace API.Controllers
             return Ok("Movie updated");
         }
 
-        // [HttpPatch("{id}/addEmployee")]
-        // public async Task<IActionResult> AddActorToMovie(Guid id, [FromBody] ICollection<MovieEmployeeDTO> newMovieEmployees)
+        // [HttpPatch("{id}/addPerson")]
+        // public async Task<IActionResult> AddPersonToMovie(Guid Id, [FromBody] JsonPatchDocument<Person> patchDocument)
         // {
-        //     // Return if request was sent with no new employees
-        //     if (newMovieEmployees.Count == 0) return ValidationProblem("No new movie employees added");
+        //     if (patchDocument == null) return BadRequest("No person to add");
 
-        //     var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
-
-        //     if (movie == null) return NotFound("Cannot add actor to requested Movie: Movie not found");
-
-        //     // Sanitize newMovieEmployees
-        //     ICollection<MovieEmployeeDTO> sanitizedNewME = MovieHelpers.SanitizeEmployeesInput(newMovieEmployees);
-
-        //     // Temporary list to store new database entires
-        //     List<Person> people = new List<Person>();
-
-        //     foreach (var employee in sanitizedNewME)
-        //     {
-        //         // Check if the person already exists in the database.
-        //         // If not, continue and don't re-add to the database.
-        //         var personInDB = await _context.People.SingleOrDefaultAsync(p => (p.FirstName == employee.FirstName && p.LastName == employee.LastName));
-        //         if (personInDB == null)
-        //         {
-        //             continue;
-        //         }
-
-        //         // Create the person and store in an List
-        //         // We will insert all at the same time as opposed to per person
-        //         var person = new Person
-        //         {
-        //             FirstName = employee.FirstName,
-        //             LastName = employee.LastName
-        //         };
-
-        //         movie.Employees.Add(new MovieEmployee { Person = person });
-        //         people.Add(person);
-        //     }
-
-        //     // Save new Person entires to the database
-        //     await _context.People.AddRangeAsync(people);
-        //     _context.Update(movie);
-        //     //_context.Movies.FirstOrDefaultAsync
-
-        //     var result = await _context.SaveChangesAsync() > 0;
-
-        //     if (!result) return BadRequest("Error adding to database");
-
-        //     return Ok("Updated employees list in the movie");
-
+        //     patchDocument.Add
         // }
     }
 }

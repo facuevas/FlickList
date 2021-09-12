@@ -1,4 +1,5 @@
-using API.DTO;
+using API.DTO.PersonDTOs;
+using API.DTO.MovieDTOs;
 using AutoMapper;
 using Domain;
 
@@ -26,10 +27,12 @@ namespace API.Core
                 .ForMember(me => me.FirstName, o => o.MapFrom(p => p.Person.FirstName))
                 .ForMember(me => me.LastName, o => o.MapFrom(p => p.Person.LastName));
 
-            // Employee Mappings
+            // Person Mappings
             CreateMap<Person, PersonDTO>();
 
             CreateMap<Person, PersonDetailDTO>();
+
+            CreateMap<PersonUpdateDTO, Person>();
 
             CreateMap<MovieEmployee, MovieEmployedDTO>()
                 .ForMember(me => me.Title, o => o.MapFrom(m => m.Movie.Title))

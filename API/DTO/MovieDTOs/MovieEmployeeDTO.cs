@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 // We use this to map the MovieEmployee join table.
 // This helps us prevent cycles
 
-namespace API.DTO
+namespace API.DTO.MovieDTOs
 {
     public class MovieEmployeeDTO
     {
