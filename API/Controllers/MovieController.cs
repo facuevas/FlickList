@@ -13,6 +13,7 @@ using FluentValidation.Results;
 using API.Validator;
 using System.Linq;
 using Microsoft.AspNetCore.JsonPatch;
+using API.DTO.PersonDTOs;
 
 namespace API.Controllers
 {
@@ -152,6 +153,51 @@ namespace API.Controllers
             if (!result) return BadRequest("Error updating Movie");
 
             return Ok("Movie updated");
+        }
+
+        [HttpPatch("{id}/addPerson")]
+        public async Task<IActionResult> AddPersonToMovie(Guid movieId, [FromBody] PersonPatchDTO pu)
+        {
+            // Check if the movie they are trying to add the person to exists
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+
+            if (movie == null) return NotFound("Movie was not found");
+
+            // Check if Person to add to movie exists in the database.
+            var person = await _context.People.FirstOrDefaultAsync(p => p.FirstName == pu.Person.FirstName && p.LastName == pu.Person.LastName);
+
+            // If person not found, let's create the person
+            // Community members can edit them later
+            if (person == null)
+            {
+                person = new Person
+                {
+                    FirstName = pu.Person.FirstName,
+                    LastName = pu.Person.LastName
+                };
+
+                _context.People.Add(person);
+            }
+
+            // If we are adding a person to the Movie, create a new MovieEmployee entry
+            if (pu.Operation == "add")
+            {
+                MovieEmployee mv = new MovieEmployee
+                {
+                    Movie = movie,
+                    Person = person
+                };
+
+                _context.MovieEmployees.Add(mv);
+
+                person.Movies.Add(mv);
+                movie.Employees.Add(mv);
+            }
+
+            if (pu.Operation == "remove")
+            {
+
+            }
         }
 
         // [HttpPatch("{id}/addPerson")]
