@@ -131,6 +131,11 @@ namespace API.Controllers
 
             if (mp.Operation == "add")
             {
+                // Check if the person exists in the movie already
+                // We can do this by seeing if it exists in our join table.
+                if (await _context.MovieEmployees.FirstOrDefaultAsync(me => me.MovieId == movie.Id && me.PersonId == person.Id) != null)
+                    return ValidationProblem("Person already is in Movie");
+
                 // Create a new MovieEmployee entry and save it to the database.
                 MovieEmployee mv = new MovieEmployee
                 {
@@ -148,6 +153,8 @@ namespace API.Controllers
             if (mp.Operation == "remove")
             {
                 MovieEmployee mv = await _context.MovieEmployees.FirstOrDefaultAsync(mv => (mv.MovieId == movie.Id && mv.PersonId == person.Id));
+
+                if (mv == null) return NotFound("Movie to remove not found");
 
                 movie.Employees.Remove(mv);
                 person.Movies.Remove(mv);

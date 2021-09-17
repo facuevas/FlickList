@@ -11,8 +11,6 @@ using System.Collections.Generic;
 using API.Core;
 using FluentValidation.Results;
 using API.Validator;
-using System.Linq;
-using Microsoft.AspNetCore.JsonPatch;
 using API.DTO.PersonDTOs;
 
 namespace API.Controllers
@@ -156,15 +154,15 @@ namespace API.Controllers
         }
 
         [HttpPatch("{id}/addPerson")]
-        public async Task<IActionResult> AddPersonToMovie(Guid movieId, [FromBody] PersonPatchDTO pu)
+        public async Task<IActionResult> AddPersonToMovie(Guid id, [FromBody] PersonPatchDTO pu)
         {
             // Check if the movie they are trying to add the person to exists
-            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
 
             if (movie == null) return NotFound("Movie was not found");
 
             // Check if Person to add to movie exists in the database.
-            var person = await _context.People.FirstOrDefaultAsync(p => p.FirstName == pu.Person.FirstName && p.LastName == pu.Person.LastName);
+            var person = await _context.People.FirstOrDefaultAsync(p => (p.FirstName == pu.Person.FirstName && p.LastName == pu.Person.LastName));
 
             // If person not found, let's create the person
             // Community members can edit them later
@@ -182,6 +180,11 @@ namespace API.Controllers
             // If we are adding a person to the Movie, create a new MovieEmployee entry
             if (pu.Operation == "add")
             {
+                // Check to see if the Person already exists in the Movie entity
+                // We can do this by seeing if it exists in our join table.
+                if (await _context.MovieEmployees.FirstOrDefaultAsync(me => me.MovieId == movie.Id && me.PersonId == person.Id) != null)
+                    return ValidationProblem("Movie already exists for this Person");
+
                 MovieEmployee mv = new MovieEmployee
                 {
                     Movie = movie,
@@ -194,10 +197,25 @@ namespace API.Controllers
                 movie.Employees.Add(mv);
             }
 
+            // If we are remving a person from the movie
             if (pu.Operation == "remove")
             {
+                MovieEmployee mv = await _context.MovieEmployees.FirstOrDefaultAsync(me => me.MovieId == movie.Id && me.PersonId == person.Id);
 
+                if (mv == null) return NotFound("Person to remove not found");
+
+                _context.MovieEmployees.Remove(mv);
+
+                person.Movies.Remove(mv);
+                movie.Employees.Remove(mv);
             }
+
+            // Save result
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (!result) return BadRequest("Issue modifying Employee resource from Movie entitiy");
+
+            return Ok("Successfully modified Employee resource from the Movie entity");
         }
 
         // [HttpPatch("{id}/addPerson")]
